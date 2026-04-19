@@ -21,6 +21,7 @@ public class CourierLoginTest {
     public void setUp() {
         courier = CourierGenerator.getRandomCourier();
         courierClient.createCourier(courier);
+
         courierId = courierClient.loginCourier(CourierGenerator.fromCourier(courier))
                 .then()
                 .extract()
@@ -56,11 +57,12 @@ public class CourierLoginTest {
 
     @Test
     public void courierLoginWithoutPasswordTest() {
-        CourierLogin loginData = new CourierLogin(courier.getLogin(), null);
+        CourierLogin loginData = new CourierLogin(courier.getLogin(), "");
 
         courierClient.loginCourier(loginData)
                 .then()
-                .statusCode(504);
+                .statusCode(400)
+                .body("message", equalTo("Недостаточно данных для входа"));
     }
 
     @Test

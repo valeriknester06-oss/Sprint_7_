@@ -22,6 +22,14 @@ public class CourierCreateTest {
 
     @After
     public void tearDown() {
+        try {
+            courierId = courierClient.loginCourier(CourierGenerator.fromCourier(courier))
+                    .then()
+                    .extract()
+                    .path("id");
+        } catch (Exception ignored) {
+        }
+
         if (courierId != null) {
             courierClient.deleteCourier(courierId);
         }
@@ -33,20 +41,11 @@ public class CourierCreateTest {
                 .then()
                 .statusCode(201)
                 .body("ok", equalTo(true));
-
-        courierId = courierClient.loginCourier(CourierGenerator.fromCourier(courier))
-                .then()
-                .extract()
-                .path("id");
     }
 
     @Test
     public void createDuplicateCourierTest() {
         courierClient.createCourier(courier);
-        courierId = courierClient.loginCourier(CourierGenerator.fromCourier(courier))
-                .then()
-                .extract()
-                .path("id");
 
         courierClient.createCourier(courier)
                 .then()
