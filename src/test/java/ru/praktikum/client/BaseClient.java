@@ -1,9 +1,9 @@
 package ru.praktikum.client;
 
-import ru.praktikum.config.TestConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import ru.praktikum.config.TestConfig;
 
 public class BaseClient {
 

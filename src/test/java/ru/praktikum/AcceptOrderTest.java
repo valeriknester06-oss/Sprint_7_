@@ -1,5 +1,7 @@
 package ru.praktikum;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +14,11 @@ import ru.praktikum.model.Order;
 
 import java.util.Collections;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_CONFLICT;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.hamcrest.Matchers.equalTo;
 
 public class AcceptOrderTest {
 
@@ -27,6 +33,7 @@ public class AcceptOrderTest {
     public void setUp() {
         courier = CourierGenerator.getRandomCourier();
         courierClient.createCourier(courier);
+
         courierId = courierClient.loginCourier(CourierGenerator.fromCourier(courier))
                 .then()
                 .extract()
@@ -53,38 +60,59 @@ public class AcceptOrderTest {
     }
 
     @Test
+    @DisplayName("Успешное принятие заказа")
+    @Description("Проверка, что курьер может принять существующий заказ")
     public void acceptOrderSuccessTest() {
         orderClient.acceptOrder(orderId, courierId)
                 .then()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .body("ok", equalTo(true));
     }
 
     @Test
+    @DisplayName("Принятие заказа без courierId")
+    @Description("Проверка, что при отсутствии courierId возвращается ошибка 400")
     public void acceptOrderWithoutCourierIdTest() {
-        orderClient.acceptOrderWithoutCourierId(orderId)
+        orderClient.acceptOrder(orderId, null)
                 .then()
-                .statusCode(400);
+                .statusCode(SC_BAD_REQUEST);
     }
 
     @Test
+    @DisplayName("Принятие заказа с неверным courierId")
+    @Description("Проверка, что при неверном courierId возвращается ошибка 404")
     public void acceptOrderWithWrongCourierIdTest() {
         orderClient.acceptOrder(orderId, 999999)
                 .then()
-                .statusCode(404);
+                .statusCode(SC_NOT_FOUND);
     }
 
     @Test
+    @DisplayName("Принятие заказа без id заказа")
+    @Description("Проверка, что при отсутствии id заказа возвращается ошибка")
     public void acceptOrderWithoutTrackTest() {
         orderClient.acceptOrderWithoutTrack(courierId)
                 .then()
-                .statusCode(404);
+                .statusCode(SC_NOT_FOUND);
     }
 
     @Test
+    @DisplayName("Принятие заказа с неверным id заказа")
+    @Description("Проверка, что при несуществующем id заказа возвращается ошибка 404")
     public void acceptOrderWithWrongTrackTest() {
         orderClient.acceptOrder(999999, courierId)
                 .then()
-                .statusCode(404);
+                .statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("Повторное принятие заказа")
+    @Description("Проверка, что уже принятый заказ нельзя принять повторно")
+    public void acceptOrderSecondTimeTest() {
+        orderClient.acceptOrder(orderId, courierId);
+
+        orderClient.acceptOrder(orderId, courierId)
+                .then()
+                .statusCode(SC_CONFLICT);
     }
 }

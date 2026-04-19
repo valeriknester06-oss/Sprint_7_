@@ -1,45 +1,48 @@
 package ru.praktikum;
 
-import ru.praktikum.client.OrderClient;
-import ru.praktikum.data.OrderGenerator;
-import ru.praktikum.model.Order;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import ru.praktikum.client.OrderClient;
+import ru.praktikum.data.OrderGenerator;
+import ru.praktikum.model.Order;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
+import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.hamcrest.Matchers.notNullValue;
 
 @RunWith(Parameterized.class)
 public class OrderCreateTest {
 
     private final OrderClient orderClient = new OrderClient();
-    private final List<String> colors;
+    private final List<String> color;
 
-    public OrderCreateTest(List<String> colors) {
-        this.colors = colors;
+    public OrderCreateTest(List<String> color) {
+        this.color = color;
     }
 
-    @Parameterized.Parameters(name = "Цвета: {0}")
-    public static Object[][] getOrderColors() {
+    @Parameterized.Parameters(name = "Цвет самоката: {0}")
+    public static Object[][] getColorData() {
         return new Object[][]{
-                {Collections.singletonList("BLACK")},
-                {Collections.singletonList("GREY")},
-                {Arrays.asList("BLACK", "GREY")},
-                {Collections.emptyList()}
+                {List.of("BLACK")},
+                {List.of("GREY")},
+                {List.of("BLACK", "GREY")},
+                {null}
         };
     }
 
     @Test
-    public void createOrderWithDifferentColorsTest() {
-        Order order = OrderGenerator.getOrderWithColor(colors);
+    @DisplayName("Создание заказа")
+    @Description("Проверка, что заказ создаётся с разными вариантами цвета самоката")
+    public void createOrderTest() {
+        Order order = OrderGenerator.getOrderWithColor(color);
 
         orderClient.createOrder(order)
                 .then()
-                .statusCode(201)
+                .statusCode(SC_CREATED)
                 .body("track", notNullValue());
     }
 }

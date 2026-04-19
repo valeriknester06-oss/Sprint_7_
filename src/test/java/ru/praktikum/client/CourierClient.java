@@ -26,7 +26,7 @@ public class CourierClient extends BaseClient {
                 .post(LOGIN_PATH);
     }
 
-    @Step("Удалить курьера по id")
+    @Step("Удалить курьера по id: {courierId}")
     public Response deleteCourier(int courierId) {
         return getBaseSpec()
                 .when()

@@ -24,22 +24,22 @@ public class OrderClient extends BaseClient {
                 .get(ORDERS_PATH);
     }
 
-    @Step("Принять заказ")
-    public Response acceptOrder(int orderTrack, int courierId) {
+    @Step("Принять заказ с id заказа {orderId} курьером {courierId}")
+    public Response acceptOrder(int orderId, Integer courierId) {
         return getBaseSpec()
                 .queryParam("courierId", courierId)
                 .when()
-                .put(ACCEPT_ORDER_PATH + "/" + orderTrack);
+                .put(ACCEPT_ORDER_PATH + "/" + orderId);
     }
 
     @Step("Принять заказ без courierId")
-    public Response acceptOrderWithoutCourierId(int orderTrack) {
+    public Response acceptOrderWithoutCourierId(int orderId) {
         return getBaseSpec()
                 .when()
-                .put(ACCEPT_ORDER_PATH + "/" + orderTrack);
+                .put(ACCEPT_ORDER_PATH + "/" + orderId);
     }
 
-    @Step("Принять заказ без номера заказа")
+    @Step("Принять заказ без id заказа")
     public Response acceptOrderWithoutTrack(int courierId) {
         return getBaseSpec()
                 .queryParam("courierId", courierId)
@@ -47,7 +47,7 @@ public class OrderClient extends BaseClient {
                 .put(ACCEPT_ORDER_PATH);
     }
 
-    @Step("Получить заказ по track")
+    @Step("Получить заказ по track {track}")
     public Response getOrderByTrack(int track) {
         return getBaseSpec()
                 .queryParam("t", track)
