@@ -1,6 +1,7 @@
-target/*
-target/allure-results/
-target/allure-results/**
+target/
+.allure/
+target/site/
+.idea/
 
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -40,7 +41,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-.idea/
-.allure/
-target/site/
-.idea/
